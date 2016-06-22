@@ -113,6 +113,7 @@ public class AnalysisMusicHistoryDataService {
     public static void processUserArtistData(Stream<String> lines,
                                                 Map<String, Integer> artistMap,
                                                 Map<String, UserInfo> userMap) throws IOException {
+        //read line by line
         for(String line : (Iterable<String>) lines::iterator) {
             try {
                 processUserArtistMap(line, artistMap, userMap);
@@ -125,20 +126,17 @@ public class AnalysisMusicHistoryDataService {
     public static void processUserArtistMap(String inputLine,
                                                 Map<String, Integer> artistMap,
                                                 Map<String, UserInfo> userMap) throws InvalidArgumentException {
-        if(inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA) < 0
-                || inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA,
-                        inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA) + 1) < 0)  {
+        String[] elements = inputLine.split(SEPERATOR_OF_USER_ARTIST_DATA);
+
+        if(elements.length != 3)  {
             throw new InvalidArgumentException("invalid inputLine=" + inputLine + ", in file=" + USER_ARTIST_DATA_FILE_NAME);
         }
 
-        String userId = inputLine.substring(0, inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA));
-        String artistId = inputLine.substring(inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA) + 1,
-                                                inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA,
-                                                                inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA) + 1));
+        String userId = elements[0];
+        String artistId = elements[1];
         int playNum;
         try {
-            playNum = Integer.parseInt(inputLine.substring(inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA,
-                    inputLine.indexOf(SEPERATOR_OF_USER_ARTIST_DATA) + 1) + 1));
+            playNum = Integer.parseInt(elements[2]);
         } catch(Exception e) {
             throw new InvalidArgumentException("invalid playNum in this line=" + inputLine + ", in file=" + USER_ARTIST_DATA_FILE_NAME);
         }
@@ -175,12 +173,13 @@ public class AnalysisMusicHistoryDataService {
     public static void processUniqueArtistMap(String inputLine,
                                                 Map<String, Integer> uniqueArtistMap,
                                                 Map<String, Integer> artistMap) throws Exception {
-        if(!inputLine.contains(SEPERATOR_OF_ARTIST_ALIAS_DATA)) {
+        String[] elements = inputLine.split(SEPERATOR_OF_ARTIST_ALIAS_DATA);
+        if(elements.length != 2) {
             throw new InvalidArgumentException("invalid inputLine=" + inputLine + ", in file=" + ARTIST_ALIAS_FILE_NAME);
         }
 
-        String artistId = inputLine.substring(0, inputLine.indexOf(SEPERATOR_OF_ARTIST_ALIAS_DATA));
-        String uniqueId = inputLine.substring(inputLine.indexOf(SEPERATOR_OF_ARTIST_ALIAS_DATA) + 1);
+        String artistId = elements[0];
+        String uniqueId = elements[1];
         if(artistId == null
                 || artistId.isEmpty()
                 || uniqueId == null
